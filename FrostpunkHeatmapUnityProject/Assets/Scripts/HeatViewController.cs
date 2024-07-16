@@ -2,7 +2,7 @@
 using UnityEngine.Rendering.PostProcessing;
 
 /// <summary>
-/// Handles the visual transition of all gameplay objects involved in the effect
+/// 处理与效果相关的所有游戏对象的视觉过渡
 /// </summary>
 public class HeatViewController : MonoBehaviour
 {

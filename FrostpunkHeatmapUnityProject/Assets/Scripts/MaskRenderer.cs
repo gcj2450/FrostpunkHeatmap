@@ -10,9 +10,9 @@ public class MaskRenderer : MonoBehaviour
     private static List<Building> buildings;
 
     /// <summary>
-    /// Each building registers itself at startup using this function
-    /// I really wouldn't do it like this in a large game project but it is 
-    /// easy to expand and thus a good fit for a tutorial
+    /// 每栋建筑在启动时都会使用此功能进行自我注册
+    /// 我真的不会在大型游戏项目中这样做，但它
+    /// 易于扩展，因此非常适合教程
     /// </summary>
     /// <param name="building">The building to add to the list</param>
     public static void RegisterBuilding(Building building)
@@ -23,14 +23,14 @@ public class MaskRenderer : MonoBehaviour
     //Properties
 
     /// <summary>
-    /// The compute shader used for rendering the mask
+    /// 用于渲染遮罩的ComputeShader
     /// </summary>
     [SerializeField]
     private ComputeShader computeShader = null;
 
     /// <summary>
-    /// The size the mask should have
-    /// Idealy this is a power of two
+    /// mask的大小
+    /// 理想情况下，这是 2 的幂。
     /// </summary>
     [Range(64, 4096)]
     [SerializeField]
@@ -46,34 +46,34 @@ public class MaskRenderer : MonoBehaviour
     private float BlendDistance = 4.0f;
 
     /// <summary>
-    /// Color used for coldest temperature
+    /// 最冷温度所用的颜色
     /// </summary>
     public Color MaskColor0;
     /// <summary>
-    /// Color used for second coldest temperature
+    /// 第二冷温度所用的颜色
     /// </summary>
     public Color MaskColor1;
     /// <summary>
-    /// Color used for second hottest temperature
+    /// 第二高温度所用的颜色
     /// </summary>
     public Color MaskColor2;
     /// <summary>
-    /// Color used for hottest temperature
+    /// 最热温度所用的颜色
     /// </summary>
     public Color MaskColor3;
     /// <summary>
-    /// Perlin Noise Texture
+    /// Perlin 噪声纹理
     /// </summary>
     public Texture2D NoiseTexture;
     /// <summary>
-    /// UV scale used when sampling the noise texture
+    /// 采样噪声纹理时使用的 UV 缩放
     /// </summary>
     [Range(0.0f, 5.0f)]
     public float NoiseDetail = 4.0f;
 
     private RenderTexture maskTexture;
 
-    //Store those properties so we can avoid string lookups in Update
+    //存储这些属性，以便我们可以避免在更新中查找字符串
     private static readonly int textureSizeId = Shader.PropertyToID("_TextureSize");
     private static readonly int buildingCountId = Shader.PropertyToID("_BuildingCount");
     private static readonly int mapSizeId = Shader.PropertyToID("_MapSize");
@@ -91,7 +91,9 @@ public class MaskRenderer : MonoBehaviour
 
     private static readonly int buildingBufferId = Shader.PropertyToID("_BuildingBuffer");
 
-    //This is the struct we parse to the compute shader for each building
+    /// <summary>
+    /// 建筑物Buffer数据结构，包含xy位置和温度及范围
+    /// </summary>
     private struct BuildingBufferElement
     {
         public float PositionX;
@@ -108,7 +110,7 @@ public class MaskRenderer : MonoBehaviour
     /// </summary>
     private void Awake()
     {
-        //It is important that this is in Awake and the Building's are getting added in Start()
+        //这里Awake实例化，便于Building.cs在Start中使用
         buildings = new List<Building>();
 
         //Create a new render texture for the mask
@@ -139,9 +141,9 @@ public class MaskRenderer : MonoBehaviour
         computeShader.SetTexture(0, noiseTexId, NoiseTexture);
         computeShader.SetFloat(noiseDetailId, NoiseDetail);
 
-        //We are using the mask texture and the map size in multiple materials
-        //Setting it as a global variable is easier in this case
-        //For a full scale game this should be set in the specific materials rather than globally
+        //我们在多种材质中使用遮罩纹理和贴图大小
+        //在这种情况下，将其设置为全局变量更容易
+        //对于全尺寸游戏，应在特定材质中设置，而不是全局设置
         Shader.SetGlobalTexture(maskTextureId, maskTexture);
         Shader.SetGlobalFloat(mapSizeId, MapSize);
 
@@ -180,11 +182,11 @@ public class MaskRenderer : MonoBehaviour
         buffer?.Release();
         buffer = new ComputeBuffer(bufferElements.Count * 4, sizeof(float));
 
-        //Set the buffer data and parse it to the compute shader
+        //设置建筑的Buffer数据将其赋予ComputeShader
         buffer.SetData(bufferElements);
         computeShader.SetBuffer(0, buildingBufferId, buffer);
 
-        //Set other variables needed in the compute function
+        //设置Building Buffer的数量
         computeShader.SetInt(buildingCountId, bufferElements.Count);
 
         //Execute the compute shader
