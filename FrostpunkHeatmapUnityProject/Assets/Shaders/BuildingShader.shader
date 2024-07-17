@@ -7,6 +7,7 @@
         [Toggle(ADD_SNOW)] _Snow("Add Snow", Float) = 0
         _SnowColor("Snow Color", Color) = (1.0, 1.0, 1.0, 1.0)
         _SnowAngle("SnowAngle", float) = 0.0
+        _HeightThreshold("HeightThreshold", float) = 0.0
     }
     SubShader
     {
@@ -67,6 +68,7 @@
             sampler2D _Mask;
             float _MapSize;
 
+            float _HeightThreshold;
             //Simple vertex function, neet world position for heatmap sampling
             v2f vert (appdata v)
             {
@@ -102,7 +104,9 @@
                     o.emission = _Emission;
                 #else
                     float4 mask = tex2D(_Mask, i.worldPos.xz / _MapSize + 0.5f);
-                    o.albedo = float4(mask.rgb, 1.0f); //albedo is simply the mask value at the given world position
+                    float4 texCol=tex2D(_MainTex, i.uv);
+                    // o.albedo =lerp( float4(mask.rgb, 1.0f),texCol,i.worldPos.y-_HeightThreshold); //albedo is simply the mask value at the given world position
+                    o.albedo =float4(mask.rgb, 1.0f); //albedo is simply the mask value at the given world position
                     o.specular = float4(0.0f, 0.0f, 0.0f, 0.0f); //No specular in the heatmap view
                     o.normal = float4(i.normal * 0.5f + 0.5f, 0.0f);
                     o.emission = float4(0.0f, 0.0f, 0.0f, 1.0f); //No emission in the heatmap view

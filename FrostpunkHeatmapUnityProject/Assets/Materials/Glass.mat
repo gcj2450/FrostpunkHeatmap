@@ -65,6 +65,7 @@ Material:
     - _GlossMapScale: 1
     - _Glossiness: 0.861
     - _GlossyReflections: 1
+    - _HeightThreshold: 0
     - _Metallic: 1
     - _Mode: 0
     - _OcclusionStrength: 1
